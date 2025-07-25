@@ -5,6 +5,7 @@
     <link rel="icon" href="img/icon.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js" integrity="sha256-/H4YS+7aYb9kJ5OKhFYPUjSJdrtV6AeyJOtTkw6X72o=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
     <script src="index.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,6 +39,7 @@
     <main>
         <textarea id="textbox"></textarea>
         <nav id="iconbar">
+            <span id="icon-encrypt" title="Encrypt Message">🔒</span>
             <span id="icon-copy" title="Copy URL to Clipboard">📋</span>
             <span id="icon-delete" title="Reset Page">✂️</span>
         </nav>
@@ -45,14 +47,23 @@
             <h2>wait!!!</h2>
             <p>your url exceeds 125 characters, thereby we offer u a shortened version</p>
 
-            <pre class="copy-field" tabindex="0" role="textbox" aria-readonly="true" onclick="copyText(this)" onkeydown="if(event.key==='Enter' || event.key===' ') {copyText(this)}" id="short-url">https://short.url/abc123</pre>
+            <pre class="copy-field" role="textbox" aria-readonly="true" id="short-url">https://short.url/abc123</pre>
 
             <p>kfc u can still get the long version</p>
 
-            <pre class="copy-field" tabindex="0" role="textbox" aria-readonly="true" onclick="copyText(this)" onkeydown="if(event.key==='Enter' || event.key===' ') {copyText(this)}" id="long-url">https://verylongurl.com/...</pre>
+            <pre class="copy-field" role="textbox" aria-readonly="true" id="long-url">https://verylongurl.com/...</pre>
 
             <form method="dialog">
                 <button>close</button>
+            </form>
+        </dialog>
+        <dialog id="super-secret-key-popup">
+            <h2>super secret key</h2>
+            <p>apply a super secret key to your url that people need to have to read your data by url!</p>
+            <textarea id="super-secret-key-textbox" placeholder="super secret key..."></textarea>
+            <form method="dialog">
+                <button id="encrypt-ssc">encrypt</button>
+                <button id="decrypt-ssc">decrypt</button>
             </form>
         </dialog>
     </main>

@@ -5,12 +5,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const dataPrivacy = document.getElementById("data-privacy");
     const privacyPopup = document.getElementById("privacy-popup");
     const shortenerPopup = document.getElementById("shortener-popup");
+    const encryptionPopup = document.getElementById("super-secret-key-popup");
     const blahaj = document.getElementById("blahaj-cursor");
+    const encrypt = document.getElementById("icon-encrypt");
+    const encryptSsc = document.getElementById("encrypt-ssc");
+    const decryptSsc = document.getElementById("decrypt-ssc");
     const copy = document.getElementById("icon-copy");
     const reset = document.getElementById("icon-delete");
     const iconbar = document.getElementById("iconbar");
-    const icons = [copy, reset];
+    const icons = [copy, reset, encrypt];
     const main = document.querySelector("main");
+
+    let super_secret_key = "";
 
     const BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -44,14 +50,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function compressToHash(text) {
-        try {
-            const textData = new TextEncoder().encode(text);
-            const compressed = pako.gzip(textData);
-            return toBase62(compressed);
-        } catch (e) {
-            console.error("Compression error:", e);
-            return "";
+        const textData = new TextEncoder().encode(text);
+        const compressed = pako.gzip(textData);
+        const base62 = toBase62(compressed);
+
+        if (super_secret_key != "") {
+            return CryptoJS.AES.encrypt(base62, super_secret_key).toString();
         }
+        return base62;
     }
 
     function decompressFromHash(hash) {
@@ -59,12 +65,21 @@ document.addEventListener("DOMContentLoaded", () => {
             return "";
         }
         try {
-            const compressed = fromBase62(hash);
+            let compressed;
+
+            if (super_secret_key !== "") {
+                const decryptedBase62 = CryptoJS.AES.decrypt(hash, super_secret_key).toString(CryptoJS.enc.Utf8);
+                compressed = fromBase62(decryptedBase62);
+            } else {
+                compressed = fromBase62(hash);
+            }
+
             const decompressed = pako.ungzip(compressed);
             return new TextDecoder().decode(decompressed);
+
         } catch (e) {
-            console.error("Decompression error:", e);
-            return "";
+            console.error("Decompression failed/Wrong SSC:", e)
+            return ""
         }
     }
 
@@ -132,65 +147,106 @@ document.addEventListener("DOMContentLoaded", () => {
         privacyPopup.showModal();
     });
 
-    privacyPopup.addEventListener("click", e => {
-        const rect = privacyPopup.getBoundingClientRect();
-        if (
-            e.clientX < rect.left || e.clientX > rect.right ||
-            e.clientY < rect.top || e.clientY > rect.bottom
-        ) {
-            privacyPopup.close();
+    encrypt.addEventListener("click", () => {
+        encryptionPopup.showModal();
+    });
+
+    const sscBox = document.getElementById("super-secret-key-textbox");
+    encryptSsc.addEventListener("click", () => {
+        if (box.value != "") {    
+            super_secret_key = sscBox.value;
+            const compressedHash = compressToHash(box.value);
+            if (compressedHash !== null) {
+                history.replaceState(null, "", "#" + compressedHash);
+            }
         }
     });
 
+    decryptSsc.addEventListener("click", () => {
+        const hashContent = location.hash.slice(1);
+        super_secret_key = sscBox.value;
+
+        if (!hashContent) {
+            return;
+        }
+
+        const text = decompressFromHash(hashContent);
+        box.value = text;
+
+        super_secret_key = ""
+        sscBox.value = ""
+        history.replaceState(null, "", location.pathname);
+    });
+
+
+    [privacyPopup, shortenerPopup, encryptionPopup].forEach(el => {
+        el.addEventListener("click", e => {
+            const rect = el.getBoundingClientRect();
+            if (
+                e.clientX < rect.left || e.clientX > rect.right ||
+                e.clientY < rect.top || e.clientY > rect.bottom
+            ) {
+                el.close();
+            }
+        });
+    });
+
+    document.querySelectorAll('.copy-field').forEach(el => {
+        el.addEventListener('click', () => {
+            const text = el.innerText.trim();
+            navigator.clipboard.writeText(text)
+                .then(() => console.log("Copied:", text))
+                .catch(err => console.error("Clipboard error:", err));
+        });
+    });
+
     copy.addEventListener("click", () => {
-    const compressed = compressToHash(box.value);
-    const fullUrl = location.origin + location.pathname + "#" + compressed;
+        const compressed = compressToHash(box.value);
+        const fullUrl = location.origin + location.pathname + "#" + compressed;
 
-    if (fullUrl.length > 125) {
-        const shortUrlEl = document.getElementById("short-url");
-        const longUrlEl = document.getElementById("long-url");
+        if (fullUrl.length > 125) {
+            const shortUrlEl = document.getElementById("short-url");
+            const longUrlEl = document.getElementById("long-url");
 
-        shortUrlEl.textContent = "Click to Shorten";
-        shortUrlEl.title = "Click to generate short URL";
-        longUrlEl.textContent = fullUrl;
-        longUrlEl.title = fullUrl;
+            shortUrlEl.textContent = "Click to Shorten";
+            shortUrlEl.title = "Click to generate short URL";
+            longUrlEl.textContent = fullUrl;
+            longUrlEl.title = fullUrl;
 
-        shortenerPopup.showModal();
+            shortenerPopup.showModal();
 
-        const generateShortUrl = () => {
-            shortUrlEl.removeEventListener("click", generateShortUrl);
+            const generateShortUrl = () => {
+                shortUrlEl.removeEventListener("click", generateShortUrl);
 
-            const loopTexts = ["Ooo", "oOo", "ooO"];
-            let i = 0;
+                const loopTexts = ["Ooo", "oOo", "ooO"];
+                let i = 0;
 
-            const anim = setInterval(() => {
-                i = (i + 1) % loopTexts.length;
-                shortUrlEl.textContent = loopTexts[i];
-            }, 300);
+                const anim = setInterval(() => {
+                    i = (i + 1) % loopTexts.length;
+                    shortUrlEl.textContent = loopTexts[i];
+                }, 300);
 
-            fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`)
-                .then(r => r.ok ? r.json() : Promise.reject())
-                .then(d => {
-                    clearInterval(anim);
-                    const url = d.shorturl || "failed to generate :c";
-                    shortUrlEl.textContent = url;
-                    shortUrlEl.title = url;
-                })
-                .catch(() => {
-                    clearInterval(anim);
-                    shortUrlEl.textContent = "Error generating URL";
-                    shortUrlEl.title = "Error generating URL";
-                });
-        };
-        shortUrlEl.addEventListener("click", generateShortUrl);
+                fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`)
+                    .then(r => r.ok ? r.json() : Promise.reject())
+                    .then(d => {
+                        clearInterval(anim);
+                        const url = d.shorturl || "failed to generate :c";
+                        shortUrlEl.textContent = url;
+                        shortUrlEl.title = url;
+                    })
+                    .catch(() => {
+                        clearInterval(anim);
+                        shortUrlEl.textContent = "Error generating URL";
+                        shortUrlEl.title = "Error generating URL";
+                    });
+            };
+            shortUrlEl.addEventListener("click", generateShortUrl);
 
-        // TODO: mouse click url for new tab shorten url yk, save shortened url if nothing changed to browser 
-    } else {
-        navigator.clipboard.writeText(fullUrl);
-    }
-});
-
-
+            // TODO: mouse click url for new tab shorten url yk, save shortened url if nothing changed to browser 
+        } else {
+            navigator.clipboard.writeText(fullUrl);
+        }
+    });
 
     ["short-url", "long-url"].forEach(id => {
         const el = document.getElementById(id); 
