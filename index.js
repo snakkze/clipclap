@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 shortUrlEl.textContent = loopTexts[i];
             }, 300);
 
-            fetch("https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}")
+            fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`)
                 .then(r => r.ok ? r.json() : Promise.reject())
                 .then(d => {
                     clearInterval(anim);
