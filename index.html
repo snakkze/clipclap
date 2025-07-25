@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
     <link rel="icon" href="img/icon.png" type="image/png">
-    <script src="lzbase62.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
     <script src="index.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -40,6 +41,20 @@
             <span id="icon-copy" title="Copy URL to Clipboard">📋</span>
             <span id="icon-delete" title="Reset Page">✂️</span>
         </nav>
+        <dialog id="shortener-popup">
+            <h2>wait!!!</h2>
+            <p>your url exceeds 125 characters, thereby we offer u a shortened version</p>
+
+            <pre class="copy-field" tabindex="0" role="textbox" aria-readonly="true" onclick="copyText(this)" onkeydown="if(event.key==='Enter' || event.key===' ') {copyText(this)}" id="short-url">https://short.url/abc123</pre>
+
+            <p>kfc u can still get the long version</p>
+
+            <pre class="copy-field" tabindex="0" role="textbox" aria-readonly="true" onclick="copyText(this)" onkeydown="if(event.key==='Enter' || event.key===' ') {copyText(this)}" id="long-url">https://verylongurl.com/...</pre>
+
+            <form method="dialog">
+                <button>close</button>
+            </form>
+        </dialog>
     </main>
     <footer>
         <p id="made-by">made by x3liinaa 🏳️‍⚧️</p>

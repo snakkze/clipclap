@@ -4,12 +4,43 @@ document.addEventListener("DOMContentLoaded", () => {
     const madeBy = document.getElementById("made-by");
     const dataPrivacy = document.getElementById("data-privacy");
     const privacyPopup = document.getElementById("privacy-popup");
+    const shortenerPopup = document.getElementById("shortener-popup");
     const blahaj = document.getElementById("blahaj-cursor");
     const copy = document.getElementById("icon-copy");
     const reset = document.getElementById("icon-delete");
     const iconbar = document.getElementById("iconbar");
     const icons = [copy, reset];
     const main = document.querySelector("main");
+
+    function compressToHash(text) {
+        try {
+            const textData = new TextEncoder().encode(text);
+            const compressed = pako.gzip(textData);
+            const base64String = btoa(String.fromCharCode(...compressed));
+            const urlSafeBase64 = base64String.replace(/\+/g, '-').replace(/\//g, '_');
+            return urlSafeBase64;
+        } catch (e) {
+            console.error("Komprimierung fehlgeschlagen:", e);
+            return ""; 
+        }
+    }
+
+    function decompressFromHash(hash) {
+        if (!hash || hash.trim() === "") {
+            return ""; 
+        }
+        
+        try {
+            let base64String = hash.replace(/-/g, '+').replace(/_/g, '/');
+            const compressed = Uint8Array.from(atob(base64String), c => c.charCodeAt(0));
+            const decompressed = pako.ungzip(compressed);
+            const text = new TextDecoder().decode(decompressed);
+            return text;
+        } catch (e) {
+            console.error("Dekomprimierung fehlgeschlagen:", e);
+            return ""; 
+        }
+    }
 
     const placeholders = [
         "I love you :3",
@@ -20,15 +51,18 @@ document.addEventListener("DOMContentLoaded", () => {
         "Your ad could be here.",
         "Mwah mwah mwah :3"
     ];
-    box.placeholder = placeholders[Math.random() * placeholders.length | 0];
+    box.placeholder = placeholders[Math.floor(Math.random() * placeholders.length)];
 
     if (location.hash.length > 1) {
-        box.value = lzbase62.decompress(location.hash.slice(1));
+        const hashContent = location.hash.slice(1);
+        box.value = decompressFromHash(hashContent);
     }
 
     box.addEventListener("input", () => {
-        const compressed = lzbase62.compress(box.value);
-        history.replaceState(null, "", "#" + compressed);
+        const compressedHash = compressToHash(box.value);
+        if (compressedHash !== null) {
+            history.replaceState(null, "", "#" + compressedHash);
+        }
     });
 
     title.addEventListener("mousedown", e => {
@@ -36,6 +70,11 @@ document.addEventListener("DOMContentLoaded", () => {
             box.value = "";
             history.replaceState(null, "", location.href.split("#")[0]);
         }
+    });
+
+    reset.addEventListener("click", () => {
+        box.value = "";
+        history.replaceState(null, "", location.href.split("#")[0]);
     });
 
     document.addEventListener("mousemove", e => {
@@ -56,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     [madeBy, dataPrivacy].forEach(el => {
         el.addEventListener("mouseenter", () => { blahaj.style.opacity = "1"; });
-        el.addEventListener("mouseleave", () => { blahaj.style.opacity = "0" });
+        el.addEventListener("mouseleave", () => { blahaj.style.opacity = "0"; });
         el.addEventListener("mousemove", e => {
             blahaj.style.left = (e.clientX - 25) + "px";
             blahaj.style.top = (e.clientY + 10) + "px";
@@ -78,16 +117,50 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     copy.addEventListener("click", () => {
-        navigator.clipboard.writeText(location.href);
+        const compressed = compressToHash(box.value);
+        const fullUrl = location.origin + location.pathname + "#" + compressed;
+
+        if (fullUrl.length > 125) {
+            const shortUrlEl = document.getElementById("short-url");
+            const longUrlEl = document.getElementById("long-url");
+
+            const loopTexts = ["Ooo", "oOo", "ooO"];
+            let i = 0;
+
+            shortUrlEl.textContent = loopTexts[i];
+            shortUrlEl.title = "Generating short URL...";
+            longUrlEl.textContent = fullUrl;
+            longUrlEl.title = fullUrl;
+
+            shortenerPopup.showModal();
+
+            const anim = setInterval(() => {
+                i = (i + 1) % loopTexts.length;
+                shortUrlEl.textContent = loopTexts[i];
+            }, 300);
+
+            fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent("fullUrl")}`)
+                .then(r => r.ok ? r.json() : Promise.reject())
+                .then(d => {
+                    clearInterval(anim);
+                    const url = d.shorturl || "failed to generate :c";
+                    shortUrlEl.textContent = url;
+                    shortUrlEl.title = url;
+                });
+        } else {
+            navigator.clipboard.writeText(fullUrl);
+        }
     });
 
-    reset.addEventListener("click", () => {
-        box.value = "";
-        history.replaceState(null, "", location.href.split("#")[0]);
-    });
 
-    function togglePrivacy() {
-        const dlg = document.getElementById("privacy-popup");
-        dlg.open ? dlg.close() : dlg.showModal();
-    }
+    ["short-url", "long-url"].forEach(id => {
+        const el = document.getElementById(id); 
+        el.addEventListener("click", () => navigator.clipboard.writeText(el.textContent));
+        el.addEventListener("keydown", e => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                navigator.clipboard.writeText(el.textContent);
+            }
+        });
+    });
 });

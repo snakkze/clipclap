@@ -16,6 +16,7 @@
 }
 
 body {
+    font-family: 'Comic Sans MS', 'Comic Neue', cursive, sans-serif;
     background: linear-gradient(135deg, #0B0A0E, #18161E, #121016);
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
@@ -35,7 +36,6 @@ body {
 }
 
 header h1 {
-    font-family: 'Comic Sans MS', cursive, sans-serif;
     font-size: 3rem;
     text-shadow: 2px 2px 8px #000;
     animation: flicker 2s infinite;
@@ -109,6 +109,87 @@ main textarea:focus {
     backdrop-filter: blur(8px);
 }
 
+dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 400px;
+    border-radius: 12px;
+    border: 1px solid rgba(255 255 255 / 0.3);
+    background: rgba(255 255 255 / 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    color: white;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    z-index: 10000;
+}
+
+dialog h2 {
+    margin-top: 0;
+    font-weight: normal;
+    font-size: 1.5rem;
+    text-transform: lowercase;
+    text-shadow: 0 0 4px #c0a0ff;
+}
+
+dialog p {
+    margin: 1rem 0 1.5rem 0;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+dialog button {
+    font-size: 1.1rem;
+    padding: 0.5rem 1.5rem;
+    background: linear-gradient(45deg, #ff99cc, #cc66ff);
+    border: 3px solid #ff66cc;
+    border-radius: 12px;
+    color: aliceblue;
+    cursor: pointer;
+    outline: none;
+    box-shadow:
+        0 0 12px #ff66cc,
+        inset 0 0 14px #cc99ff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+    text-shadow: 0 0 3px #ff66cc;
+}
+
+dialog button:hover {
+    transform: rotate(-6deg) scale(1.1);
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+}
+
+.copy-field {
+    margin: 1rem 0 1.5rem 0;
+    padding: 0.5rem 1rem;
+    background: rgba(255 255 255 / 0.15);
+    border-radius: 12px;
+    border: 1px solid rgba(255 255 255 / 0.4);
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: white;
+    user-select: all;
+    box-shadow:
+        0 0 6px rgba(255 255 255 / 0.2);
+    transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 footer {
     width: 100%;
     position: fixed;
@@ -120,7 +201,6 @@ footer {
 }
 
 footer p {
-    font-family: 'Comic Sans MS', cursive, sans-serif;
     text-shadow:
         0 0 2px #c0a0ff;
     margin-top: auto;
@@ -138,42 +218,7 @@ footer p:hover {
         0 0 8px #ffc9ff;
 }
 
-footer dialog#privacy-popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90vw;
-    max-width: 400px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-    font-family: 'Comic Sans MS', cursive, sans-serif;
-    color: white;
-    padding: 1.5rem 2rem;
-    text-align: center;
-    z-index: 10000;
-}
-
-footer dialog#privacy-popup h2 {
-    margin-top: 0;
-    font-weight: normal;
-    font-size: 1.5rem;
-    text-transform: lowercase;
-    text-shadow: 0 0 4px #c0a0ff;
-}
-
-footer dialog#privacy-popup p {
-    margin: 1rem 0 1.5rem 0;
-    font-size: 1rem;
-    line-height: 1.4;
-}
-
 dialog#privacy-popup button {
-    font-family: 'Comic Sans MS', cursive, sans-serif;
     font-size: 1.1rem;
     padding: 0.5rem 1.5rem;
     background: linear-gradient(45deg, #ff99cc, #cc66ff);
@@ -193,12 +238,6 @@ dialog#privacy-popup button {
 dialog#privacy-popup button:hover {
     transform: rotate(-6deg) scale(1.1);
 }
-
-footer dialog::backdrop {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(5px);
-}
-
 
 footer img {
     position: fixed;
