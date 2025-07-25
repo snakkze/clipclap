@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="img/blahaj-favicon.png" type="image/png">
+    <script src="lzbase62.min.js"></script>
+    <script src="index.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ClipClap</title>
+    <meta property="og:title" content="ClipClap – tiny pastebin magic ✨" />
+    <meta property="og:description" content="Create, compress and share text directly via URL. No backend. No limits. Just ✂️ and 📋" />
+    <meta property="og:url" content="https://deine-url.de/" />
+    <meta property="og:image" content="https://deine-url.de/img/clipclap-preview.png" />
+    <meta name="theme-color" content="#a76dff" />
+
+</head>
+<body>
+    <header>
+        <h1 id="title">ClipClap</h1>
+    </header>
+    <main>
+        <textarea id="textbox"></textarea>
+        <nav id="iconbar">
+            <span id="icon-copy" title="Copy URL to Clipboard">📋</span>
+            <span id="icon-delete" title="Reset Page">✂️</span>
+        </nav>
+    </main>
+    <footer>
+        <p id="made-by">made by x3liinaa 🏳️‍⚧️</p>
+        <p id="data-privacy">data privacy</p>
+        <dialog id="privacy-popup">
+            <h2>data privacy</h2>
+            <p>clipclap saves no data, all data is stored within the url you share with other people.</p>
+            <form method="dialog">
+                <button>close</button>
+            </form>
+        </dialog>
+        <img id="blahaj-cursor" src="img/findus.gif" alt="Blahaj">
+    </footer>
+</body>
+</html>

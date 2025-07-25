@@ -1,0 +1,210 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: aliceblue;
+}
+
+@keyframes gradientBG {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+body {
+    background: linear-gradient(135deg, #0B0A0E, #18161E, #121016);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 2rem;
+    gap: 1rem;
+    padding-bottom: 56px;
+}
+
+@keyframes flicker {
+    0%, 100% {opacity: 1;}
+    50% {opacity: 0.9;}
+}
+
+header h1 {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 3rem;
+    text-shadow: 2px 2px 8px #000;
+    animation: flicker 2s infinite;
+    cursor: pointer;
+}
+
+main {
+    background: rgba(148, 148, 148, 0.08);
+    border-radius: 12px;
+    box-shadow: 
+        0 4px 30px 
+        rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(6.4px);
+    -webkit-backdrop-filter: blur(6.4px);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+main textarea {
+    background-color: transparent;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    width: 100%;
+    color: white;
+    font-size: 1rem;
+    font-family: monospace;
+    resize: none;
+    flex: 1;
+    min-height: 0;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.05);
+    transition: 
+        box-shadow 0.2s ease, 
+        backdrop-filter 0.3s ease;
+}
+
+#iconbar {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 1919px) {
+  #icon-copy,
+  #icon-delete {
+    opacity: 1 !important;
+  }
+}
+
+#icon-copy, #icon-delete {
+  font-size: 1.2em;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+}
+
+
+main textarea:focus {
+    outline: none;
+    box-shadow:
+        0 0 6px rgba(255, 255, 255, 0.1),
+        0 0 12px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+}
+
+footer {
+    width: 100%;
+    position: fixed;
+    bottom: 2px;
+    left: 0;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+footer p {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    text-shadow:
+        0 0 2px #c0a0ff;
+    margin-top: auto;
+    cursor: default;
+    opacity: 0.9;
+    transition:
+        opacity 0.3s ease,
+        text-shadow 0.3s ease;
+}
+
+footer p:hover {
+    opacity: 1;
+    text-shadow:
+        0 0 4px #ffbfff,
+        0 0 8px #ffc9ff;
+}
+
+footer dialog#privacy-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 400px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    color: white;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    z-index: 10000;
+}
+
+footer dialog#privacy-popup h2 {
+    margin-top: 0;
+    font-weight: normal;
+    font-size: 1.5rem;
+    text-transform: lowercase;
+    text-shadow: 0 0 4px #c0a0ff;
+}
+
+footer dialog#privacy-popup p {
+    margin: 1rem 0 1.5rem 0;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+dialog#privacy-popup button {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 1.1rem;
+    padding: 0.5rem 1.5rem;
+    background: linear-gradient(45deg, #ff99cc, #cc66ff);
+    border: 3px solid #ff66cc;
+    border-radius: 12px;
+    color: aliceblue;
+    cursor: pointer;
+    outline: none;
+    box-shadow:
+        0 0 12px #ff66cc,
+        inset 0 0 14px #cc99ff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+    text-shadow: 0 0 3px #ff66cc;
+}
+
+dialog#privacy-popup button:hover {
+    transform: rotate(-6deg) scale(1.1);
+}
+
+footer dialog::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+}
+
+
+footer img {
+    position: fixed;
+    pointer-events: none;
+    width: 32px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    user-select: none;
+    z-index: 9999;
+    
+    filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.3));
+}
+
