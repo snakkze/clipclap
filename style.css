@@ -3,6 +3,7 @@
 }
 
 * {
+    font-family: 'Comic Sans MS', 'Comic Neue', cursive, sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -16,7 +17,6 @@
 }
 
 body {
-    font-family: 'Comic Sans MS', 'Comic Neue', cursive, sans-serif;
     background: linear-gradient(135deg, #0B0A0E, #18161E, #121016);
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
