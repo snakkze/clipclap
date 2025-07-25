@@ -12,33 +12,59 @@ document.addEventListener("DOMContentLoaded", () => {
     const icons = [copy, reset];
     const main = document.querySelector("main");
 
+    const BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    function toBase62(uint8Array) {
+        let num = BigInt(0);
+        for (let byte of uint8Array) {
+            num = (num << BigInt(8)) + BigInt(byte);
+        }
+        if (num === BigInt(0)) return "0";
+
+        let result = "";
+        while (num > 0) {
+            result = BASE62[num % BigInt(62)] + result;
+            num = num / BigInt(62);
+        }
+        return result;
+    }
+
+    function fromBase62(str) {
+        let num = BigInt(0);
+        for (let char of str) {
+            num = num * BigInt(62) + BigInt(BASE62.indexOf(char));
+        }
+
+        const bytes = [];
+        while (num > 0) {
+            bytes.unshift(Number(num % BigInt(256)));
+            num = num / BigInt(256);
+        }
+        return new Uint8Array(bytes);
+    }
+
     function compressToHash(text) {
         try {
             const textData = new TextEncoder().encode(text);
             const compressed = pako.gzip(textData);
-            const base64String = btoa(String.fromCharCode(...compressed));
-            const urlSafeBase64 = base64String.replace(/\+/g, '-').replace(/\//g, '_');
-            return urlSafeBase64;
+            return toBase62(compressed);
         } catch (e) {
-            console.error("Komprimierung fehlgeschlagen:", e);
-            return ""; 
+            console.error("Compression error:", e);
+            return "";
         }
     }
 
     function decompressFromHash(hash) {
         if (!hash || hash.trim() === "") {
-            return ""; 
+            return "";
         }
-        
         try {
-            let base64String = hash.replace(/-/g, '+').replace(/_/g, '/');
-            const compressed = Uint8Array.from(atob(base64String), c => c.charCodeAt(0));
+            const compressed = fromBase62(hash);
             const decompressed = pako.ungzip(compressed);
-            const text = new TextDecoder().decode(decompressed);
-            return text;
+            return new TextDecoder().decode(decompressed);
         } catch (e) {
-            console.error("Dekomprimierung fehlgeschlagen:", e);
-            return ""; 
+            console.error("Decompression error:", e);
+            return "";
         }
     }
 
@@ -139,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 shortUrlEl.textContent = loopTexts[i];
             }, 300);
 
-            fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}`)
+            fetch("https://is.gd/create.php?format=json&url=${encodeURIComponent(fullUrl)}")
                 .then(r => r.ok ? r.json() : Promise.reject())
                 .then(d => {
                     clearInterval(anim);
