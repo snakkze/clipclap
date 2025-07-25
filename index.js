@@ -143,22 +143,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     copy.addEventListener("click", () => {
-        const compressed = compressToHash(box.value);
-        const fullUrl = location.origin + location.pathname + "#" + compressed;
+    const compressed = compressToHash(box.value);
+    const fullUrl = location.origin + location.pathname + "#" + compressed;
 
-        if (fullUrl.length > 125) {
-            const shortUrlEl = document.getElementById("short-url");
-            const longUrlEl = document.getElementById("long-url");
+    if (fullUrl.length > 125) {
+        const shortUrlEl = document.getElementById("short-url");
+        const longUrlEl = document.getElementById("long-url");
+
+        shortUrlEl.textContent = "Click to Shorten";
+        shortUrlEl.title = "Click to generate short URL";
+        longUrlEl.textContent = fullUrl;
+        longUrlEl.title = fullUrl;
+
+        shortenerPopup.showModal();
+
+        const generateShortUrl = () => {
+            shortUrlEl.removeEventListener("click", generateShortUrl);
 
             const loopTexts = ["Ooo", "oOo", "ooO"];
             let i = 0;
-
-            shortUrlEl.textContent = loopTexts[i];
-            shortUrlEl.title = "Generating short URL...";
-            longUrlEl.textContent = fullUrl;
-            longUrlEl.title = fullUrl;
-
-            shortenerPopup.showModal();
 
             const anim = setInterval(() => {
                 i = (i + 1) % loopTexts.length;
@@ -172,11 +175,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     const url = d.shorturl || "failed to generate :c";
                     shortUrlEl.textContent = url;
                     shortUrlEl.title = url;
+                })
+                .catch(() => {
+                    clearInterval(anim);
+                    shortUrlEl.textContent = "Error generating URL";
+                    shortUrlEl.title = "Error generating URL";
                 });
-        } else {
-            navigator.clipboard.writeText(fullUrl);
-        }
-    });
+        };
+        shortUrlEl.addEventListener("click", generateShortUrl);
+
+        // TODO: mouse click url for new tab shorten url yk, save shortened url if nothing changed to browser 
+    } else {
+        navigator.clipboard.writeText(fullUrl);
+    }
+});
+
 
 
     ["short-url", "long-url"].forEach(id => {
